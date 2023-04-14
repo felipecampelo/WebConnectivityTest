@@ -25,7 +25,7 @@ def _site_check(urls):
         except Exception as e:
             result = False
             error = str(e)
-        display_check_result(result, url, error)
+        display_check_result(result, url.rstrip('\n'), error)
 
 if __name__ == "__main__":
     main()
