@@ -7,10 +7,15 @@ from cli import display_check_result, read_user_cli_args
 def main():
     user_args = read_user_cli_args()
     urls = user_args.urls
-    if not urls:
-        print("Faltou URL cara")
+    file = user_args.file
+
+    if urls:
+        _site_check(urls)
+    elif file:
+        _site_check(file)
+    else:
+        print("Você não digitou nem a URL e nem um arquivo...")
         sys.exit(1)
-    _site_check(urls)
 
 def _site_check(urls):
     for url in urls:

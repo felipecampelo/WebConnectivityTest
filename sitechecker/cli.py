@@ -15,6 +15,9 @@ def read_user_cli_args():
         default=[],
         help="Insira um ou mais URLs"
     )
+
+    parser.add_argument("--file", type=argparse.FileType('r'))
+
     return parser.parse_args()
 
 def display_check_result(result, url, error=""):
