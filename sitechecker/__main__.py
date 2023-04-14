@@ -1,8 +1,8 @@
 import sys
 
 from asyncore import read
-from sitechecker.checker import site_is_online
-from sitechecker.cli import display_check_result, read_user_cli_args
+from checker import site_is_online
+from cli import display_check_result, read_user_cli_args
 
 def main():
     user_args = read_user_cli_args()
