@@ -187,5 +187,5 @@ def _site_check(urls):
 
 Dessa forma, podemos executar a aplicação da seguintes formas: 
 
-1) Para uma ou mais URLs: python __main__.py -u [site1] [site2] ...
-2) Para um arquivo CSV: python __main__.py --file [ARQUIVO.csv]
+1) Para uma ou mais URLs: ```python __main__.py -u [site1] [site2] ...```
+2) Para um arquivo CSV: ```python __main__.py --file [ARQUIVO.csv]```
