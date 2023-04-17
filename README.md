@@ -55,20 +55,18 @@ Vamos incluir essa lógica em um arquivo `checker.py` que vai lidar com possíve
 
 ```python
 # checker.py
+
 from http.client import HTTPConnection
 from urllib.parse import urlparse
 
-def site_is_online(url, timeout=2):
+def site_is_online(url, timeout=10):
     """Return True if the target URL is online.
 
     Raise an exception otherwise.
     """
-    # Defines a generic Exception as placeholder
-    error = Exception("Ops, algo errado.")
-    # Parses URL and finds host
+    error = Exception("Deu ruim!")
     parser = urlparse(url)
     host = parser.netloc or parser.path.split("/")[0]
-    # Starts a for loop using HTTP and HTTPs ports
     for port in (80, 443):
         connection = HTTPConnection(host=host, port=port, timeout=timeout)
         try:
@@ -102,10 +100,11 @@ Para criarmos uma aplicação de linha de comando (*CLI*) vamos usar o `argparse
 import argparse
 
 def read_user_cli_args():
-    """Handle the CLI arguments and options."""
+
     parser = argparse.ArgumentParser(
         prog="sitechecker", description="Teste a disponibilidade de uma URL"
     )
+
     parser.add_argument(
         "-u",
         "--urls",
@@ -113,8 +112,11 @@ def read_user_cli_args():
         nargs="+",
         type=str,
         default=[],
-        help="insira um ou mais URLs",
+        help="Insira um ou mais URLs"
     )
+
+    parser.add_argument("--file", type=argparse.FileType('r'))
+
     return parser.parse_args()
 ```
 
@@ -125,10 +127,9 @@ Já temos uma função que recebe argumentos do CLI, mas ainda precisamos retorn
 # ...
 
 def display_check_result(result, url, error=""):
-    """Display the result of a connectivity check."""
-    print(f'O status da "{url}" é:', end=" ")
+    print(f'Os status da "{url}" é:', end =" ")
     if result:
-        print('"Online!" 👍')
+        print('"Online!👍"')
     else:
         print(f'"Offline?" 👎 \n  Erro: "{error}"')
 
@@ -147,13 +148,17 @@ import sys
 from sitechecker.cli import read_user_cli_args
 
 def main():
-    """Run Site Checker."""
     user_args = read_user_cli_args()
     urls = user_args.urls
-    if not urls:
-        print("Erro: sem URLs para analisar.", file=sys.stderr)
+    file = user_args.file
+
+    if urls:
+        _site_check(urls)
+    elif file:
+        _site_check(file)
+    else:
+        print("Você não digitou nem a URL e nem um arquivo...")
         sys.exit(1)
-    _site_check(urls)
 ```
 
 Logo vemos que esse código não irá rodar porque ainda não definimos a função `_site_check()`. Esta função vai iterar sobre uma lista de URLs obtida dos argumentos do CLI e aplicar a função `site_is_online()` que definimos anteriormente. Em caso de sucesso, ela retornará `True`. E `False` se a consulta retornar um erro. 
@@ -177,15 +182,10 @@ def _site_check(urls):
         except Exception as e:
             result = False
             error = str(e)
-        display_check_result(result, url, error)
+        display_check_result(result, url.rstrip('\n'), error)
 ```
 
-# TODO
+Dessa forma, podemos executar a aplicação da seguintes formas: 
 
-- [ ] Ampliar a função acima para permitir a inclusão de arquivos com listas de URLs no CLI passando um caminho --file path/to/file.csv.
-- [ ] Criar um script em Bash que permite rodar esse verificador a partir de uma periodicidade pré-definida (por exemplo, a cada 24 horas). Ver CRON.
-
-# Credits
-
-Exemplo baseado em:
-https://realpython.com/site-connectivity-checker-python/
+1) Para uma ou mais URLs: python __main__.py -u [site1] [site2] ...
+2) Para um arquivo CSV: python __main__.py --file [ARQUIVO.csv]
