@@ -1,19 +1,11 @@
-# Fundamentos de Computação Tooltorial
+# Web Connectivity Test 💻
 
-Neste tutorial faremos uma aplicação simples em Python para validar conceitos básicos na linguagem Python e versionamento de código. Essa aplicação vai validar se um URL está online ou offline e retornar uma mensagem para o usuário.
+Aplicação Python para validar se um URL está online ou offline e retornar uma mensagem para o usuário.
 
-Ao final do projeto deveremos ter a seguinte estrutura de arquivos:
+Estrutura de arquivos:
 
-```
-README.md
-requirements.txt
-site_checker.sh
-sitechecker/
-├── checker.py
-├── cli.py
-├── __init__.py
-├── __main__.py
-```
+![image](https://user-images.githubusercontent.com/13797593/233219592-46abaef5-9413-454e-9617-0ee5d9d37821.png)
+
 # Instruções
 
 ## 1. Criar o ambiente de trabalho
@@ -34,63 +26,36 @@ PS> venv\Scripts\activate
 (venv) PS>
 ```
 
-## 2. Criar o verificador de sites
+## 2. Verificador de sites
 
-Vamos começar criando uma simples função em Python que que verifica se um site está online usando o pacote `urllib` e`http`. Para isso podemos o código abaixo em uma sessão interativa:
-
-```
->>> from http.client import HTTPConnection
-
->>> connection = HTTPSConnection("indicium.tech", port=80, timeout=10)
->>> connection.request("HEAD", "/")
-
->>> response = connection.getresponse()
->>> response.getheaders()
-[('Date', 'Tue, 20 Sep 2022 18:10:37 GMT'), ('Content-Type', 'text/html'), ('Content-Length', '178'), ('Connection', 'keep-alive'), ('Cache-Control', 'max-age=600'), ('Location', 'https://www.globo.com/')]
-```
-
-Esse código inicia criando uma conexão para uma URL `globo.com` usando a porta padrão HTTP 80. Em seguida, fazemos uma requisição para o caminho padrão "/" usando o método `.request()`. A resposta dessa requisição é obtida pelo método `.getresponse()`. Finalmente, para evitar trazer todo o arquivo do site trazemos somente o HEADER. Se o *request* tiver sucesso, o site está online. Caso contrário, retorná um erro.
-
-Vamos incluir essa lógica em um arquivo `checker.py` que vai lidar com possíveis erros:
+O arquivo `checker.py` é a responsável para a verificação e está demonstrada abaixo:
 
 ```python
-# checker.py
+import requests
+from colorama import Fore, Back, Style
 
-from http.client import HTTPConnection
-from urllib.parse import urlparse
-
-def site_is_online(url, timeout=10):
-    """Return True if the target URL is online.
-
-    Raise an exception otherwise.
-    """
-    error = Exception("Deu ruim!")
-    parser = urlparse(url)
-    host = parser.netloc or parser.path.split("/")[0]
-    for port in (80, 443):
-        connection = HTTPConnection(host=host, port=port, timeout=timeout)
-        try:
-            connection.request("HEAD", "/")
-            return True
-        except Exception as e:
-            error = e
-        finally:
-            connection.close()
-    raise error
+def site_is_online(url):
+    
+    https = 'https://'
+    if url[:4] != 'http':
+        url = https + url
+    
+    try:
+        response = requests.get(url)
+        if response.status_code == 200:
+            print(f'O site {url} está ' + Fore.GREEN + 'online! ✔️' + Style.RESET_ALL) 
+        else:
+            print(f'O site {url} está ' + Fore.RED + 'offline! ❌' + Style.RESET_ALL)
+    except requests.exceptions.RequestException as e:
+        print(f'O site {url} está ' + Fore.RED + 'offline! ❌' + Style.RESET_ALL)
 ```
+Nela, utilizamos a biblioteca requests para fazer a checagem e a biblioteca colocama para mudarmos a cor dos textos de resposta. 
 
-Para testar a função recém criada, abra uma sessão interativa no Python e rode o código abaixo:
+A função site_is_online irá verificar se o argumento digitado pelo usuário está iniciado com o `http` ou não. Caso não, ele irá adicionar o `https://` para que o resquests.get não retorne erro.
 
-```python
->>> from sitechecker.checker import site_is_online
+Enfim, caso o `status_code` do site for 200, então ele está online. Caso contrário, estará offline.
 
->>> site_is_online("indicium.tech")
-True
-
->>> site_is_online("incidium.tech")
-```
-
-## 3. Criar o CLI
+## 3. CLI
 
 Para criarmos uma aplicação de linha de comando (*CLI*) vamos usar o `argparse` do python. Para isso, precisamos criar uma classe `ArgumentParser` que recebe argumentos da linha de comando.
 
@@ -119,24 +84,11 @@ def read_user_cli_args():
 
     return parser.parse_args()
 ```
+Nesse caso, o usuário poderá iniciar a aplicação com argumentos de URLs (-u) ou com argumento de arquivo (--file).
 
-Já temos uma função que recebe argumentos do CLI, mas ainda precisamos retornar algo para nosso usuário. Para isso vamos clicar uma função que retorna uma mensagem de sucesso se o site estiver online ou de fracasso se o site não está online.
+## 4. Construindo a aplicação principal
 
-```python
-# cli.py
-# ...
-
-def display_check_result(result, url, error=""):
-    print(f'Os status da "{url}" é:', end =" ")
-    if result:
-        print('"Online!👍"')
-    else:
-        print(f'"Offline?" 👎 \n  Erro: "{error}"')
-
-```
-## 4. Juntando tudo
-
-Agora chegou a hora de juntar a lógica criada no arquivo `checker.py` com nosso `cli.py`. Para isso vamos criar um arquivo `__main__.py` que permite executar o pacote como um executável usando `python -m <nome_do_pacote>`.
+Nesse momento, fazemos a execução da lógica criada no arquivo `checker.py` com nosso `cli.py`. Para isso vamos criar um arquivo `__main__.py` que permite executar o pacote como um executável usando `python <nome_do_pacote>`.
 
 Vamos começar criando uma função `main()` que lê os argumentos do CLI e chamará as demais funções necessárias:
 
@@ -161,7 +113,7 @@ def main():
         sys.exit(1)
 ```
 
-Logo vemos que esse código não irá rodar porque ainda não definimos a função `_site_check()`. Esta função vai iterar sobre uma lista de URLs obtida dos argumentos do CLI e aplicar a função `site_is_online()` que definimos anteriormente. Em caso de sucesso, ela retornará `True`. E `False` se a consulta retornar um erro. 
+Logo vemos que esse código não irá rodar porque ainda não definimos a função `_site_check()`. Esta função vai iterar sobre uma lista de URLs obtida dos argumentos do CLI e aplicar a função `site_is_online()` que definimos anteriormente.
 
 ```python
 # __main__.py
@@ -173,19 +125,34 @@ from sitechecker.cli import read_user_cli_args
 
 def main():
     # ...
-
+ 
 def _site_check(urls):
     for url in urls:
-        error = ""
-        try:
-            result = site_is_online(url)
-        except Exception as e:
-            result = False
-            error = str(e)
-        display_check_result(result, url.rstrip('\n'), error)
+        result = site_is_online(url.rstrip('\n'))
+        
+if __name__ == "__main__":
+    main()
 ```
 
-Dessa forma, podemos executar a aplicação da seguintes formas: 
+Assim, podemos executar a aplicação da seguintes formas: 
 
 1) Para uma ou mais URLs: ```python __main__.py -u [site1] [site2] ...```
+
+Exemplo de resposta: 
+
+```python
+python .\sitechecker\ -u https://googlezdxsdasdasd.com google.com indicium.tech siasdiasd.br google.com
+```
+
+![image](https://user-images.githubusercontent.com/13797593/233221961-7d95fd0a-e783-4783-a5d7-b36968e55c04.png)
+
 2) Para um arquivo CSV: ```python __main__.py --file [ARQUIVO.csv]```
+
+Exemplo de resposta: 
+
+```python
+python .\sitechecker\ --file .\sitechecker\list.csv
+```
+
+![image](https://user-images.githubusercontent.com/13797593/233221673-e8d4a72f-9673-4d6f-b882-0fe4b40d0fc7.png)
+
