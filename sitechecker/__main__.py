@@ -2,7 +2,7 @@ import sys
 
 from asyncore import read
 from checker import site_is_online
-from cli import display_check_result, read_user_cli_args
+from cli import read_user_cli_args
 
 def main():
     user_args = read_user_cli_args()
@@ -19,13 +19,7 @@ def main():
 
 def _site_check(urls):
     for url in urls:
-        error = ""
-        try:
-            result = site_is_online(url)
-        except Exception as e:
-            result = False
-            error = str(e)
-        display_check_result(result, url.rstrip('\n'), error)
+        result = site_is_online(url.rstrip('\n'))
 
 if __name__ == "__main__":
     main()

@@ -20,9 +20,9 @@ def read_user_cli_args():
 
     return parser.parse_args()
 
-def display_check_result(result, url, error=""):
-    print(f'Os status da "{url}" é:', end =" ")
-    if result:
-        print('"Online!👍"')
-    else:
-        print(f'"Offline?" 👎 \n  Erro: "{error}"')
+# def display_check_result(result, url, error=""):
+#     print(f'Os status da "{url}" é:', end =" ")
+#     if result:
+#         print('"Online!👍"')
+#     else:
+#         print(f'"Offline?" 👎 \n  Erro: "{error}"')
