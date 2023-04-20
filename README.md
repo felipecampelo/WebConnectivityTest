@@ -2,10 +2,6 @@
 
 Aplicação Python para validar se um URL está online ou offline e retornar uma mensagem para o usuário.
 
-Estrutura de arquivos:
-
-![image](https://user-images.githubusercontent.com/13797593/233219592-46abaef5-9413-454e-9617-0ee5d9d37821.png)
-
 # Instruções
 
 ## 1. Criar o ambiente de trabalho
@@ -134,7 +130,7 @@ if __name__ == "__main__":
     main()
 ```
 
-Assim, podemos executar a aplicação da seguintes formas: 
+## 5. Execução da aplicação em duas formas distintas:
 
 1) Para uma ou mais URLs: ```python __main__.py -u [site1] [site2] ...```
 
@@ -156,3 +152,18 @@ python .\sitechecker\ --file .\sitechecker\list.csv
 
 ![image](https://user-images.githubusercontent.com/13797593/233221673-e8d4a72f-9673-4d6f-b882-0fe4b40d0fc7.png)
 
+## 6. Agendamento da cron job para o Windows:
+
+➡️ Abra o Painel de Controle do Windows e depois clique nas **Administrative Tools**.
+
+➡️ Clique duas vezes no **Task Scheduler** e depois escolha a opção 'Create Basic Task…'.
+
+➡️ Digite um nome para sua tarefa (você também pode digitar uma descrição, se necessário), e então pressione **Next**.
+
+➡️ Escolha iniciar a tarefa '**Daily**' e especifique o horário de execução desejado.
+
+➡️ Selecione, **Start a program** e pressione **Next**.
+
+➡️ Use o botão **Browse** para encontrar o arquivo de lote (cronjob_windows.bat) que executa o script Python.
+
+➡️ Finalmente, clique em **Finish**. A partir deste ponto, o programa será executado no horário informado.
